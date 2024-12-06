@@ -6,6 +6,7 @@ import { ConversionList } from '@/components/conversion-list';
 import { convertImage, downloadAllAsZip, type ConversionFormat } from '@/lib/imageConverter';
 import { ConverterHeader } from '@/components/converter/header';
 import { FormatSelector } from '@/components/converter/format-selector';
+import { OptimizationSettings } from '@/components/converter/optimization-settings';
 import { useConversions } from '@/hooks/use-conversions';
 import { Button } from '@/components/ui/button';
 import { Download, Loader2, Play, X } from 'lucide-react';
@@ -17,6 +18,7 @@ export default function Home() {
   const [pendingFiles, setPendingFiles] = useState<File[]>([]);
   const [progress, setProgress] = useState(0);
   const [format, setFormat] = useState<ConversionFormat>('webp-to-png');
+  const [targetSizeKB, setTargetSizeKB] = useState<number>(100);
 
   const handleFilesDrop = (files: File[]) => {
     setPendingFiles(files);
@@ -46,7 +48,7 @@ export default function Home() {
         const conversionId = newConversions[i].id;
 
         try {
-          const result = await convertImage(file, format);
+          const result = await convertImage(file, format, format === 'png-optimize' ? targetSizeKB : undefined);
           updateConversion(conversionId, {
             url: result.url,
             name: result.name,
@@ -83,17 +85,37 @@ export default function Home() {
   const hasCompletedConversions = conversions.some(conv => conv.status === 'completed');
   const hasPendingFiles = pendingFiles.length > 0;
 
-  const acceptedFileType = format === 'webp-to-png' ? '.webp' : '.png';
-  const dropzoneText = format === 'webp-to-png' 
-    ? 'Drop WebP files here or click to select'
-    : 'Drop PNG files here or click to select';
+  const getAcceptedFileType = () => {
+    switch (format) {
+      case 'webp-to-png':
+        return '.webp';
+      case 'png-to-webp':
+      case 'png-optimize':
+        return '.png';
+      default:
+        return '';
+    }
+  };
+
+  const getDropzoneText = () => {
+    switch (format) {
+      case 'webp-to-png':
+        return 'Drop WebP files here or click to select';
+      case 'png-to-webp':
+        return 'Drop PNG files here or click to select';
+      case 'png-optimize':
+        return 'Drop PNG files here to optimize';
+      default:
+        return 'Drop files here or click to select';
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-4xl mx-auto p-6">
         <ConverterHeader />
         
-        <div className="mb-6">
+        <div className="mb-6 flex items-center gap-4">
           <FormatSelector
             value={format}
             onChange={(newFormat) => {
@@ -102,14 +124,21 @@ export default function Home() {
             }}
             disabled={isConverting || hasPendingFiles}
           />
+          
+          {format === 'png-optimize' && (
+            <OptimizationSettings
+              onTargetSizeChange={setTargetSizeKB}
+              disabled={isConverting}
+            />
+          )}
         </div>
 
         <Dropzone
           onFilesDrop={handleFilesDrop}
           className="mb-8"
           disabled={isConverting}
-          accept={acceptedFileType}
-          text={dropzoneText}
+          accept={getAcceptedFileType()}
+          text={getDropzoneText()}
         />
 
         {(hasPendingFiles || conversions.length > 0) && (

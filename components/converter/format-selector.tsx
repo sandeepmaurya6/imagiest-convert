@@ -22,6 +22,7 @@ export function FormatSelector({ value, onChange, disabled }: FormatSelectorProp
       <SelectContent>
         <SelectItem value="webp-to-png">WebP to PNG</SelectItem>
         <SelectItem value="png-to-webp">PNG to WebP</SelectItem>
+        <SelectItem value="png-optimize">PNG Optimizer</SelectItem>
       </SelectContent>
     </Select>
   );
