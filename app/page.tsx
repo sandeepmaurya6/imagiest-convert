@@ -11,6 +11,7 @@ import { useConversions } from '@/hooks/use-conversions';
 import { Button } from '@/components/ui/button';
 import { Download, Loader2, Play, X } from 'lucide-react';
 import { truncateFilename } from '@/lib/utils';
+import { Analytics } from "@vercel/analytics/react";
 
 export default function Home() {
   const { conversions, addConversions, updateConversion, clearConversions } = useConversions();
