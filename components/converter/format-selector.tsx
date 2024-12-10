@@ -1,7 +1,7 @@
 'use client';
 
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ConversionFormat } from "@/lib/imageConverter";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { FORMAT_CATEGORIES, type ConversionFormat } from "@/lib/constants";
 
 interface FormatSelectorProps {
   value: ConversionFormat;
@@ -20,9 +20,18 @@ export function FormatSelector({ value, onChange, disabled }: FormatSelectorProp
         <SelectValue placeholder="Select format" />
       </SelectTrigger>
       <SelectContent>
-        <SelectItem value="webp-to-png">WebP to PNG</SelectItem>
-        <SelectItem value="png-to-webp">PNG to WebP</SelectItem>
-        <SelectItem value="png-optimize">PNG Optimizer</SelectItem>
+        {Object.entries(FORMAT_CATEGORIES).map(([category, { label, formats }]) => (
+          <SelectGroup key={category}>
+            <SelectLabel className="px-2 py-1.5 text-sm font-semibold text-muted-foreground">
+              {label}
+            </SelectLabel>
+            {Object.entries(formats).map(([value, { label }]) => (
+              <SelectItem key={value} value={value}>
+                {label}
+              </SelectItem>
+            ))}
+          </SelectGroup>
+        ))}
       </SelectContent>
     </Select>
   );

@@ -22,7 +22,9 @@ export function OptimizationSettings({ onTargetSizeChange, disabled }: Optimizat
 
   return (
     <div className="space-y-2">
-      <Label htmlFor="target-size">Target Size (KB)</Label>
+      <Label htmlFor="target-size" className="text-sm text-muted-foreground">
+        Target Size (KB)
+      </Label>
       <Input
         id="target-size"
         type="number"
@@ -30,7 +32,8 @@ export function OptimizationSettings({ onTargetSizeChange, disabled }: Optimizat
         value={targetSize}
         onChange={(e) => handleChange(e.target.value)}
         disabled={disabled}
-        className="w-[180px]"
+        className="w-[180px] transition-colors"
+        placeholder="Enter target size..."
       />
     </div>
   );

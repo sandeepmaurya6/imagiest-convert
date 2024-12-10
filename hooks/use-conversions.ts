@@ -9,6 +9,7 @@ interface ConversionItem {
   blob?: Blob;
   status: 'converting' | 'completed' | 'error';
   error?: string;
+  timeTaken?: number;
 }
 
 export function useConversions() {

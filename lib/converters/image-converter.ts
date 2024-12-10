@@ -1,8 +1,6 @@
 import { saveAs } from 'file-saver';
 import JSZip from 'jszip';
-import { optimizeImage } from './imageOptimizer';
-
-export type ConversionFormat = 'webp-to-png' | 'png-to-webp' | 'png-optimize' | 'jpeg-optimize';
+import { optimizeImage } from './image-optimizer';
 
 interface ConversionResult {
   name: string;
@@ -12,13 +10,13 @@ interface ConversionResult {
 
 export async function convertImage(
   file: File,
-  format: ConversionFormat,
+  format: string,
   targetSizeKB?: number
 ): Promise<ConversionResult> {
   return new Promise(async (resolve, reject) => {
     try {
       if (format === 'png-optimize' || format === 'jpeg-optimize') {
-        const { blob } = await optimizeImage(file, targetSizeKB || 100, format);
+        const { blob } = await optimizeImage(file, targetSizeKB || 100, format as 'png-optimize' | 'jpeg-optimize');
         const url = URL.createObjectURL(blob);
         resolve({
           name: file.name,
@@ -53,7 +51,6 @@ export async function convertImage(
               return;
             }
             
-            // Get the base name without extension and add new extension
             const baseName = file.name.replace(/\.[^/.]+$/, '');
             const newFileName = `${baseName}${fileExtension}`;
             
@@ -75,19 +72,4 @@ export async function convertImage(
       reject(error);
     }
   });
-}
-
-export function downloadImage(url: string, fileName: string) {
-  saveAs(url, fileName);
-}
-
-export async function downloadAllAsZip(conversions: Array<{ name: string; blob: Blob }>) {
-  const zip = new JSZip();
-  
-  conversions.forEach(({ name, blob }) => {
-    zip.file(name, blob);
-  });
-  
-  const zipBlob = await zip.generateAsync({ type: 'blob' });
-  saveAs(zipBlob, 'converted-images.zip');
 }
